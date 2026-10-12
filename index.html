@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patel Game Zone</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#101329;color:white}
+header{text-align:center;padding:25px 10px;background:linear-gradient(135deg,#5417a8,#e52e71)}
+h1{margin:0;font-size:30px}
+header p{margin-bottom:0}
+.coins{margin:18px auto;background:#25294b;padding:15px;border-radius:14px;text-align:center;max-width:350px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:15px;max-width:700px;margin:auto}
+.card{background:#222644;border:1px solid #41476b;border-radius:15px;padding:18px 8px;text-align:center}
+.icon{font-size:38px}
+button{border:0;border-radius:9px;padding:10px 14px;background:#ffbd35;color:#171329;font-weight:bold;cursor:pointer;margin-top:8px}
+#game{display:none;text-align:center;background:#222644;border-radius:15px;margin:10px auto;padding:20px;max-width:500px}
+#result{min-height:28px;color:#69f5c5}
+footer{text-align:center;padding:25px;color:#b9bdd8;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h1>🎮 PATEL GAME ZONE</h1>
+<p>Play • Enjoy • Have Fun!</p>
+</header>
+
+<div class="coins">🪙 Virtual Coins: <b id="coins">1000</b></div>
+
+<div class="grid">
+<div class="card"><div class="icon">🧩</div><h3>Number Puzzle</h3><button onclick="puzzle()">Play</button></div>
+<div class="card"><div class="icon">✈️</div><h3>Aeroplane Race</h3><button onclick="race()">Play</button></div>
+<div class="card"><div class="icon">🃏</div><h3>Andar Bahar</h3><button onclick="andar()">Play</button></div>
+<div class="card"><div class="icon">🎰</div><h3>Lucky Slots</h3><button onclick="slots()">Play</button></div>
+<div class="card"><div class="icon">🎡</div><h3>Lucky Wheel</h3><button onclick="wheel()">Play</button></div>
+<div class="card"><div class="icon">🪙</div><h3>Coin Flip</h3><button onclick="flip()">Play</button></div>
+<div class="card"><div class="icon">🧠</div><h3>Memory Match</h3><button onclick="memory()">Play</button></div>
+</div>
+
+<div id="game">
+<h2 id="gameTitle">Game</h2>
+<p id="gameText">Let's play!</p>
+<div id="gameArea"></div>
+<p id="result"></p>
+<button onclick="closeGame()">Back to Games</button>
+</div>
+
+<footer>Free-to-play demo • Virtual coins have no cash value.<br>Patel Game Zone © 2026</footer>
+
+<script>
+let coins=1000;
+function show(title,text,html=""){
+ document.getElementById('game').style.display='block';
+ document.getElementById('gameTitle').textContent=title;
+ document.getElementById('gameText').textContent=text;
+ document.getElementById('gameArea').innerHTML=html;
+ document.getElementById('result').textContent='';
+ document.getElementById('game').scrollIntoView({behavior:'smooth'});
+}
+function msg(t){document.getElementById('result').textContent=t}
+function update(){document.getElementById('coins').textContent=coins}
+function reward(n){coins+=n;update();msg("You earned "+n+" virtual coins!")}
+function puzzle(){
+ let a=[1,2,3,4,5,6,7,8,0].sort(()=>Math.random()-.5);
+ show("Number Puzzle","Tap a number next to the empty space to move it.",
+ '<div id="board style"></div><div id="puzzle" style="display:grid;grid-template-columns:repeat(3,60px);gap:5px;justify-content:center"></div>');
+ const b=document.getElementById('puzzle');
+ function draw(){b.innerHTML='';a.forEach((v,i)=>{let x=document.createElement('button');x.style.height='55px';x.textContent=v||' ';x.disabled=!v;x.onclick=()=>{let z=a.indexOf(0);if([z-3,z+3,z-1,z+1].includes(i)&&!(Math.abs(z-i)==1&&Math.floor(z/3)!=Math.floor(i/3))){[a[z],a[i]]=[a[i],a[z]];draw();if(a.join(',')==='1,2,3,4,5,6,7,8,0')reward(50)}};b.appendChild(x)})}
+ draw()
+}
+function race(){show("Aeroplane Race","Roll the dice and move your plane!",'<button onclick="msg(\\'🎲 You rolled: \\'+(Math.floor(Math.random()*6)+1))">Roll Dice 🎲</button>')}
+function andar(){show("Andar Bahar","Guess which side wins!",'<button onclick="guessSide(\\'Andar\\')">Andar</button> <button onclick="guessSide(\\'Bahar\\')">Bahar</button>');}
+function guessSide(s){let w=Math.random()<.5?'Andar':'Bahar';if(s===w){reward(20);msg('Correct! '+w+' wins.')}else msg('Try again! '+w+' won.')}
+function slots(){show("Lucky Slots","Press spin for a random result.",'<button onclick="spin()">SPIN 🎰</button><div id="slot" style="font-size:35px;margin:15px"></div>')}
+function spin(){let a=['🍒','🍋','⭐','💎'];let s=Array.from({length:3},()=>a[Math.floor(Math.random()*a.length)]);document.getElementById('slot').textContent=s.join(' ');if(s[0]===s[1]&&s[1]===s[2])reward(50);else msg('Good try!')}
+function wheel(){show("Lucky Wheel","Spin to win virtual coins.",'<button onclick="spinWheel()">SPIN 🎡</button>')}
+function spinWheel(){let n=[10,20,30,50,100][Math.floor(Math.random()*5)];reward(n)}
+function flip(){show("Coin Flip","Choose heads or tails.",'<button onclick="coin(\\'Heads\\')">Heads</button> <button onclick="coin(\\'Tails\\')">Tails</button>')}
+function coin(s){let w=Math.random()<.5?'Heads':'Tails';if(s===w){reward(10);msg('It was '+w+'! You win.')}else msg('It was '+w+'. Try again!')}
+function memory(){show("Memory Match","Find the matching pairs.",'<div id="mem" style="display:grid;grid-template-columns:repeat(4,55px);gap:6px;justify-content:center"></div>');let a=['🐱','🐶','🍎','🚗','🐱','🐶','🍎','🚗'].sort(()=>Math.random()-.5),first=null,lock=false,found=0;let b=document.getElementById('mem');a.forEach((v,i)=>{let x=document.createElement('button');x.textContent='❔';x.style.height='55px';x.onclick=()=>{if(lock||x.dataset.open||x.dataset.found)return;x.textContent=v;x.dataset.open='1';if(!first)first=x;else{if(first.textContent===x.textContent){first.dataset.found='1';x.dataset.found='1';found+=2;first=null;if(found===8)reward(40)}else{lock=true;setTimeout(()=>{first.textContent='❔';x.textContent='❔';delete first.dataset.open;delete x.dataset.open;first=null;lock=false},700)}}};b.appendChild(x)})}
+function closeGame(){document.getElementById('game').style.display='none';window.scrollTo({top:0,behavior:'smooth'})}
+</script>
+</body>
+</html>
