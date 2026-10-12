@@ -2,312 +2,383 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Patel Game Zone</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patel Game Zone Cricket</title>
 <style>
 *{box-sizing:border-box}
 body{
  margin:0;font-family:Arial,sans-serif;
- background:#101329;color:white
+ color:white;background:#071c16;
 }
 header{
- text-align:center;padding:25px 10px;
- background:linear-gradient(135deg,#5417a8,#e52e71)
+ padding:24px 12px;text-align:center;
+ background:linear-gradient(135deg,#063e2d,#159447);
 }
-h1{margin:0;font-size:28px}
-.coins{
- margin:15px auto;background:#25294b;
- padding:15px;border-radius:14px;
- text-align:center;max-width:350px
+h1{margin:0;font-size:27px}
+header p{margin-bottom:0}
+.container{max-width:650px;margin:auto;padding:14px}
+.panel{
+ background:#122f26;border:1px solid #286c4d;
+ border-radius:15px;padding:16px;margin:13px 0;
 }
-.grid{
- display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
- gap:12px;padding:15px;max-width:700px;margin:auto
+label{display:block;margin:12px 0 6px}
+select{
+ width:100%;padding:12px;border-radius:8px;
+ font-size:16px;background:white;color:#17251e;
 }
-.card{
- background:#222644;border:1px solid #41476b;
- border-radius:15px;padding:15px 8px;text-align:center
-}
-.icon{font-size:38px}
 button{
- border:0;border-radius:9px;padding:11px 14px;
- background:#ffbd35;color:#171329;font-weight:bold;
- cursor:pointer;margin:5px
+ padding:12px 16px;border:0;border-radius:9px;
+ background:#ffd447;color:#18241c;font-weight:bold;
+ font-size:15px;cursor:pointer;margin:5px;
 }
-#game{
- display:none;text-align:center;background:#222644;
- border-radius:15px;margin:10px auto;padding:20px;
- max-width:500px
+button:disabled{opacity:.45}
+.primary{background:#30e28a}
+.hidden{display:none!important}
+.center{text-align:center}
+.score{
+ background:#04140e;padding:15px;border-radius:12px;
+ text-align:center;font-size:21px;line-height:1.8;
 }
-#result{min-height:28px;color:#69f5c5}
-#gameArea{margin:15px auto}
-footer{text-align:center;padding:25px;color:#b9bdd8;font-size:13px}
-.tile{width:58px;height:55px;padding:5px;font-size:18px}
-.memcard{width:55px;height:55px;padding:5px;font-size:24px}
-@media(max-width:350px){
- .grid{gap:7px;padding:8px}
- .card{padding:10px 4px}
- .tile{width:48px}
+.field{
+ background:radial-gradient(ellipse,#48a85b,#126232);
+ border:7px solid #8bce70;border-radius:50%;
+ min-height:210px;display:flex;flex-direction:column;
+ justify-content:center;align-items:center;
+ margin:15px 0;overflow:hidden;
 }
+.pitch{font-size:45px}
+.ball{font-size:35px;animation:bounce .6s ease-in-out}
+@keyframes bounce{
+ 0%{transform:translateY(-35px) scale(.7)}
+ 60%{transform:translateY(0) scale(1.1)}
+ 100%{transform:translateY(0) scale(1)}
+}
+#message{
+ min-height:42px;color:#ffe27a;
+ font-weight:bold;text-align:center;font-size:18px;
+}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.teambox{
+ background:#071c16;padding:12px;border-radius:10px;
+ text-align:center
+}
+.small{color:#c1d9cc;font-size:13px}
+footer{text-align:center;color:#b4c9bd;padding:25px;font-size:12px}
 </style>
 </head>
-
 <body>
 
 <header>
-<h1>🎮 PATEL GAME ZONE</h1>
-<p>Play • Enjoy • Have Fun!</p>
+<h1>🏏 PATEL GAME ZONE</h1>
+<p>🌍 International Cricket Championship</p>
 </header>
 
-<div class="coins">
-🪙 Virtual Coins: <b id="coins">1000</b>
+<div class="container">
+
+<section id="setup" class="panel">
+<h2>🏆 Create Your Match</h2>
+
+<label for="teamA">Select Your Team</label>
+<select id="teamA"></select>
+
+<label for="teamB">Select Opponent Team</label>
+<select id="teamB"></select>
+
+<label for="overs">Match Overs</label>
+<select id="overs">
+<option value="5">5 Overs</option>
+</select>
+
+<button class="primary" onclick="startMatch()">START MATCH 🏏</button>
+<p class="small">Choose two different international teams.</p>
+</section>
+
+<section id="tossPanel" class="panel hidden center">
+<h2>🪙 Toss Time!</h2>
+<div id="tossText">Tossing...</div>
+<button onclick="chooseToss('bat')">🏏 Bat First</button>
+<button onclick="chooseToss('bowl')">🎯 Bowl First</button>
+</section>
+
+<section id="match" class="hidden">
+<div class="panel">
+<div class="score" id="scoreboard"></div>
+<div class="teams">
+ <div class="teambox"><div id="batTeam"></div><div id="batStats"></div></div>
+ <div class="teambox"><div id="bowlTeam"></div><div id="bowlStats"></div></div>
 </div>
 
-<div class="grid">
- <div class="card"><div class="icon">🧩</div><h3>Number Puzzle</h3><button onclick="puzzle()">Play</button></div>
- <div class="card"><div class="icon">✈️</div><h3>Aeroplane Race</h3><button onclick="race()">Play</button></div>
- <div class="card"><div class="icon">🃏</div><h3>Andar Bahar</h3><button onclick="andar()">Play</button></div>
- <div class="card"><div class="icon">🎰</div><h3>Lucky Slots</h3><button onclick="slots()">Play</button></div>
- <div class="card"><div class="icon">🎡</div><h3>Lucky Wheel</h3><button onclick="wheel()">Play</button></div>
- <div class="card"><div class="icon">🪙</div><h3>Coin Flip</h3><button onclick="flip()">Play</button></div>
- <div class="card"><div class="icon">🧠</div><h3>Memory Match</h3><button onclick="memory()">Play</button></div>
+<div class="field">
+<div style="font-size:35px">🏟️ 🏟️ 🏟️</div>
+<div class="pitch" id="pitch">🏏 🧍</div>
+<div id="ball" class="ball">🏏</div>
+<div id="crowd">👏 👏 👏 👏</div>
 </div>
 
-<div id="game">
- <h2 id="gameTitle">Game</h2>
- <p id="gameText"></p>
- <div id="gameArea"></div>
- <p id="result"></p>
- <button onclick="closeGame()">⬅ Back to Games</button>
+<div id="message">Match ready!</div>
+
+<div id="batControls" class="center">
+<h3>🏏 Choose Your Shot</h3>
+<button onclick="playBall(0)">Defend · 0</button>
+<button onclick="playBall(1)">1 Run</button>
+<button onclick="playBall(2)">2 Runs</button>
+<button onclick="playBall(3)">3 Runs</button>
+<button onclick="playBall(4)">FOUR 🏏</button>
+<button onclick="playBall(6)">SIX 🚀</button>
+</div>
+
+<div id="bowlControls" class="center hidden">
+<h3>🎯 Choose Your Delivery</h3>
+<button onclick="bowlBall(0)">Yorker</button>
+<button onclick="bowlBall(1)">Fast Ball</button>
+<button onclick="bowlBall(2)">Swing Ball</button>
+<button onclick="bowlBall(3)">Spin Ball</button>
+</div>
+
+<div class="center">
+<button onclick="restartMatch()">🔄 New Match</button>
+</div>
+</div>
+</section>
+
+<section id="resultPanel" class="panel hidden center">
+<h2>🏆 Match Result</h2>
+<div id="resultText"></div>
+<button onclick="restartMatch()">Play Another Match</button>
+</section>
+
 </div>
 
 <footer>
-Free-to-play demo • Virtual coins have no cash value.<br>
-Patel Game Zone © 2026
+Patel Game Zone © 2026<br>
+Free-to-play cricket demo. No real-money betting.
 </footer>
 
 <script>
-let coins=1000;
+const teams=[
+"🇮🇳 India",
+"🇦🇺 Australia",
+"🏴 England",
+"🇵🇰 Pakistan",
+"🇿🇦 South Africa",
+"🇳🇿 New Zealand",
+"🇱🇰 Sri Lanka",
+"🇧🇩 Bangladesh",
+"🇦🇫 Afghanistan",
+"🏝️ West Indies"
+];
 
-function show(title,text,html=""){
- document.getElementById("game").style.display="block";
- document.getElementById("gameTitle").textContent=title;
- document.getElementById("gameText").textContent=text;
- document.getElementById("gameArea").innerHTML=html;
- document.getElementById("result").textContent="";
- document.getElementById("game").scrollIntoView({behavior:"smooth"});
-}
+const teamA=document.getElementById("teamA");
+const teamB=document.getElementById("teamB");
 
-function msg(text){
- document.getElementById("result").textContent=text;
-}
+teams.forEach((t,i)=>{
+ teamA.add(new Option(t,t,i===0,i===0));
+ teamB.add(new Option(t,t,i===1,i===1));
+});
 
-function update(){
- document.getElementById("coins").textContent=coins;
-}
+let A,B,first,second,innings=1;
+let runs=[0,0],wickets=[0,0],balls=[0,0];
+let maxBalls=30,target=0,finished=false;
+let userBatFirst=true,battingFirstIndex=0;
 
-function reward(n){
- coins+=n;
- update();
- msg("🎉 You earned "+n+" virtual coins!");
-}
+function startMatch(){
+ A=teamA.value;
+ B=teamB.value;
 
-function puzzle(){
- let a=[1,2,3,4,5,6,7,8,0];
- for(let i=a.length-1;i>0;i--){
-  let j=Math.floor(Math.random()*(i+1));
-  [a[i],a[j]]=[a[j],a[i]];
+ if(A===B){
+  alert("Please select two different teams!");
+  return;
  }
 
- show("Number Puzzle","Tap a number next to the empty space.",'<div id="puzzle" style="display:grid;grid-template-columns:repeat(3,60px);gap:5px;justify-content:center"></div>');
+ maxBalls=Number(document.getElementById("overs").value)*6;
+ runs=[0,0];wickets=[0,0];balls=[0,0];
+ innings=1;finished=false;
 
- let b=document.getElementById("puzzle");
- let won=false;
-
- function draw(){
-  b.innerHTML="";
-  a.forEach((v,i)=>{
-   let x=document.createElement("button");
-   x.className="tile";
-   x.textContent=v||"";
-   x.disabled=!v||won;
-
-   x.onclick=()=>{
-    let z=a.indexOf(0);
-    let adjacent=
-      Math.abs(Math.floor(z/3)-Math.floor(i/3))+
-      Math.abs(z%3-i%3)===1;
-
-    if(adjacent){
-     [a[z],a[i]]=[a[i],a[z]];
-     draw();
-
-     if(a.join(",")==="1,2,3,4,5,6,7,8,0"){
-      won=true;
-      reward(50);
-      msg("🎉 Puzzle solved! +50 coins");
-      draw();
-     }
-    }
-   };
-
-   b.appendChild(x);
-  });
- }
- draw();
+ document.getElementById("setup").classList.add("hidden");
+ document.getElementById("resultPanel").classList.add("hidden");
+ document.getElementById("match").classList.add("hidden");
+ document.getElementById("tossPanel").classList.remove("hidden");
+ document.getElementById("tossText").textContent=
+  A+" vs "+B+" — Tossing the coin! 🪙";
 }
 
-function race(){
- show("Aeroplane Race","Roll the dice to move your plane.",'<div id="plane" style="font-size:40px">✈️</div><p id="distance">Distance: 0 / 30</p><button id="rollDice">Roll Dice 🎲</button>');
+function chooseToss(choice){
+ // Toss winner chooses batting or bowling.
+ const tossWinner=Math.random()<.5?A:B;
+ document.getElementById("tossText").textContent=
+  tossWinner+" won the toss! You selected "+choice+" first.";
 
- let distance=0;
- let finished=false;
-
- document.getElementById("rollDice").onclick=()=>{
-  if(finished)return;
-  let n=Math.floor(Math.random()*6)+1;
-  distance+=n;
-  document.getElementById("distance").textContent="Distance: "+Math.min(distance,30)+" / 30";
-  document.getElementById("plane").textContent=distance>=30?"🏆✈️":"✈️";
-  if(distance>=30){
-   finished=true;
-   reward(50);
-   msg("You reached the finish line! +50 coins");
-  }else{
-   msg("You rolled "+n+"!");
-  }
- };
-}
-
-function andar(){
- show("Andar Bahar","Choose a side. This is a simple random demo.",'<button id="andarBtn">Andar</button><button id="baharBtn">Bahar</button>');
- document.getElementById("andarBtn").onclick=()=>guessSide("Andar");
- document.getElementById("baharBtn").onclick=()=>guessSide("Bahar");
-}
-
-function guessSide(s){
- let w=Math.random()<0.5?"Andar":"Bahar";
- if(s===w){
-  reward(20);
-  msg("Correct! "+w+" wins. +20 coins");
+ if(choice==="bat"){
+  first=A;second=B;
  }else{
-  msg("This round: "+w+" won. Try again!");
+  first=B;second=A;
  }
+ battingFirstIndex=0;
+ userBatFirst=(first===A);
+
+ document.getElementById("tossPanel").classList.add("hidden");
+ document.getElementById("match").classList.remove("hidden");
+ updateUI();
 }
 
-function slots(){
- show("Lucky Slots","Press Spin to play.",'<div id="slot" style="font-size:38px;margin:15px">❔ ❔ ❔</div><button id="spinBtn">SPIN 🎰</button>');
- document.getElementById("spinBtn").onclick=spin;
+function battingTeam(){
+ return innings===1?first:second;
+}
+function bowlingTeam(){
+ return innings===1?second:first;
+}
+function idx(){
+ return innings-1;
+}
+function ballsLeft(){
+ return Math.max(0,maxBalls-balls[idx()]);
+}
+function oversText(n){
+ return Math.floor(n/6)+"."+(n%6);
+}
+function updateUI(){
+ if(finished)return;
+
+ document.getElementById("scoreboard").innerHTML=
+  "<b>"+battingTeam()+"</b><br>"+
+  runs[idx()]+" / "+wickets[idx()]+"<br>"+
+  "<span style='font-size:15px'>Overs: "+
+  oversText(balls[idx()])+" / "+(maxBalls/6)+
+  "</span>"+
+  (innings===2?"<br>Target: "+target:"");
+
+ document.getElementById("batTeam").textContent="🏏 "+battingTeam();
+ document.getElementById("batStats").textContent=
+  runs[idx()]+" runs · "+wickets[idx()]+" wickets";
+ document.getElementById("bowlTeam").textContent="🎯 "+bowlingTeam();
+ document.getElementById("bowlStats").textContent=
+  ballsLeft()+" balls left";
+
+ const userIsBatting=battingTeam()===A;
+ document.getElementById("batControls").classList.toggle("hidden",!userIsBatting);
+ document.getElementById("bowlControls").classList.toggle("hidden",userIsBatting);
+ document.getElementById("pitch").textContent=
+  userIsBatting?"🏏 🧍":"🎯 🏏";
+ document.getElementById("message").textContent=
+  userIsBatting?"You are batting. Choose a shot!":"You are bowling. Choose a delivery!";
 }
 
-function spin(){
- let symbols=["🍒","🍋","⭐","💎","7️⃣"];
- let s=Array.from({length:3},()=>symbols[Math.floor(Math.random()*symbols.length)]);
- document.getElementById("slot").textContent=s.join(" ");
- if(s[0]===s[1]&&s[1]===s[2]){
-  reward(50);
-  msg("Three matching symbols! +50 coins");
+function animateBall(){
+ const ball=document.getElementById("ball");
+ ball.classList.remove("ball");
+ void ball.offsetWidth;
+ ball.classList.add("ball");
+}
+
+function playBall(shot){
+ if(finished||innings!==1||battingTeam()!==A)return;
+
+ animateBall();
+ let outcome=Math.random();
+
+ if(outcome<0.10){
+  wickets[idx()]++;
+  balls[idx()]++;
+  document.getElementById("message").textContent="💥 OUT! The batter is dismissed!";
  }else{
-  msg("Good try! Spin again.");
+  let actual=shot;
+  // Occasional variation for a more game-like batting result.
+  if(shot===6&&outcome<0.25)actual=4;
+  if(shot===4&&outcome<0.20)actual=2;
+  runs[idx()]+=actual;
+  balls[idx()]++;
+  document.getElementById("message").textContent=
+   actual===6?"🚀 SIX! Amazing shot!":
+   actual===4?"🎉 FOUR! Beautiful boundary!":
+   actual===0?"Defensive shot. No run.":"🏏 "+actual+" run(s)!";
  }
+ afterBall();
 }
 
-function wheel(){
- show("Lucky Wheel","Spin to win virtual coins.",'<div id="wheel" style="font-size:45px">🎡</div><button id="wheelBtn">SPIN</button>');
- document.getElementById("wheelBtn").onclick=spinWheel;
-}
+function bowlBall(delivery){
+ if(finished||innings!==2||battingTeam()!==B)return;
 
-function spinWheel(){
- let prizes=[10,20,30,50,100];
- let n=prizes[Math.floor(Math.random()*prizes.length)];
- document.getElementById("wheel").textContent="🎉";
- reward(n);
- msg("Wheel prize: "+n+" virtual coins!");
-}
+ animateBall();
+ let r=Math.random();
 
-function flip(){
- show("Coin Flip","Choose Heads or Tails.",'<div id="coinIcon" style="font-size:45px">🪙</div><button id="headsBtn">Heads</button><button id="tailsBtn">Tails</button>');
- document.getElementById("headsBtn").onclick=()=>coin("Heads");
- document.getElementById("tailsBtn").onclick=()=>coin("Tails");
-}
-
-function coin(s){
- let w=Math.random()<0.5?"Heads":"Tails";
- document.getElementById("coinIcon").textContent=w==="Heads"?"🙂":"🪙";
- if(s===w){
-  reward(10);
-  msg("It was "+w+"! You won 10 coins.");
+ if(r<0.12){
+  wickets[idx()]++;
+  balls[idx()]++;
+  document.getElementById("message").textContent="🎯 WICKET! Great bowling!";
  }else{
-  msg("It was "+w+". Try again!");
+  let scored;
+  if(r<0.35)scored=0;
+  else if(r<0.58)scored=1;
+  else if(r<0.75)scored=2;
+  else if(r<0.86)scored=3;
+  else if(r<0.96)scored=4;
+  else scored=6;
+
+  // Delivery choice slightly changes the outcome.
+  if(delivery===0&&r<0.22)scored=0;
+  if(delivery===3&&r>0.92)scored=6;
+
+  runs[idx()]+=scored;
+  balls[idx()]++;
+  document.getElementById("message").textContent=
+   scored===6?"🚀 Batter hit a SIX!":
+   scored===4?"🏏 FOUR!":
+   "Batter scored "+scored+" run(s).";
  }
+ afterBall();
 }
 
-function memory(){
- let values=["🐱","🐶","🍎","🚗","🐱","🐶","🍎","🚗"];
- for(let i=values.length-1;i>0;i--){
-  let j=Math.floor(Math.random()*(i+1));
-  [values[i],values[j]]=[values[j],values[i]];
+function afterBall(){
+ if(innings===1&&
+   (balls[0]>=maxBalls||wickets[0]>=10)){
+  target=runs[0]+1;
+  innings=2;
+  document.getElementById("message").textContent=
+   "First innings over! Target: "+target;
+  updateUI();
+  return;
  }
 
- show("Memory Match","Find all four matching pairs.",'<div id="mem" style="display:grid;grid-template-columns:repeat(4,55px);gap:6px;justify-content:center"></div>');
+ if(innings===2&&
+   (balls[1]>=maxBalls||wickets[1]>=10||runs[1]>=target)){
+  endMatch();
+  return;
+ }
 
- let first=null;
- let lock=false;
- let found=0;
- let b=document.getElementById("mem");
-
- values.forEach(v=>{
-  let x=document.createElement("button");
-  x.className="memcard";
-  x.textContent="❔";
-
-  x.onclick=()=>{
-   if(lock||x.dataset.open||x.dataset.found)return;
-
-   x.textContent=v;
-   x.dataset.open="1";
-
-   if(first===null){
-    first=x;
-   }else{
-    let previous=first;
-
-    if(previous.textContent===x.textContent){
-     previous.dataset.found="1";
-     x.dataset.found="1";
-     delete previous.dataset.open;
-     delete x.dataset.open;
-     first=null;
-     found+=2;
-
-     if(found===8){
-      reward(40);
-      msg("All pairs matched! +40 coins");
-     }
-    }else{
-     lock=true;
-     setTimeout(()=>{
-      previous.textContent="❔";
-      x.textContent="❔";
-      delete previous.dataset.open;
-      delete x.dataset.open;
-      first=null;
-      lock=false;
-     },800);
-    }
-   }
-  };
-
-  b.appendChild(x);
- });
+ updateUI();
 }
 
-function closeGame(){
- document.getElementById("game").style.display="none";
- window.scrollTo({top:0,behavior:"smooth"});
+function endMatch(){
+ finished=true;
+ document.getElementById("batControls").classList.add("hidden");
+ document.getElementById("bowlControls").classList.add("hidden");
+
+ let result;
+ if(runs[0]===runs[1]){
+  result="🏆 Match Tied!";
+ }else if(runs[0]>runs[1]){
+  result="🏆 "+first+" won by "+(runs[0]-runs[1])+" runs!";
+ }else{
+  result="🏆 "+second+" won the match!";
+ }
+
+ document.getElementById("resultText").innerHTML=
+  "<h3>"+result+"</h3>"+
+  "<p>"+first+": "+runs[0]+"/"+wickets[0]+
+  " ("+oversText(balls[0])+" overs)</p>"+
+  "<p>"+second+": "+runs[1]+"/"+wickets[1]+
+  " ("+oversText(balls[1])+" overs)</p>";
+
+ document.getElementById("match").classList.add("hidden");
+ document.getElementById("resultPanel").classList.remove("hidden");
+}
+
+function restartMatch(){
+ document.getElementById("setup").classList.remove("hidden");
+ document.getElementById("tossPanel").classList.add("hidden");
+ document.getElementById("match").classList.add("hidden");
+ document.getElementById("resultPanel").classList.add("hidden");
 }
 </script>
-
 </body>
 </html>
